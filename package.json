@@ -14,7 +14,7 @@
     "configuration",
     "config"
   ],
-  "author": "Sam Plews",
+  "author": "Sam Plews <the@codeite.com> (https://github.com/thecodeite)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/thecodeite/sp-conf/issues"
