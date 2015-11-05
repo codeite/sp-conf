@@ -1,0 +1,27 @@
+{
+  "name": "sp-conf",
+  "version": "0.1.0",
+  "description": "A small framework for reading config",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha specs/**/*.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thecodeite/sp-conf.git"
+  },
+  "keywords": [
+    "configuration",
+    "config"
+  ],
+  "author": "Sam Plews",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thecodeite/sp-conf/issues"
+  },
+  "homepage": "https://github.com/thecodeite/sp-conf#readme",
+  "devDependencies": {
+    "chai": "^3.4.0",
+    "mocha": "^2.3.3"
+  }
+}
