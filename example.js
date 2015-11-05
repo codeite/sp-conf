@@ -4,6 +4,7 @@ const regexForIpV4Address = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
 
 module.exports = {
   port: conf.readNumber("PORT", {defaultValue: 8080}),
+  user: conf.readString(["CURRENT_USER", "DEFAULT_USER"]),
   database: {
     host: conf.readString("DB_HOST_IP", {validator: regexForIpV4Address}),
     port: conf.readNumber("DB_PORT"),

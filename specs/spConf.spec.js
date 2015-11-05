@@ -74,11 +74,11 @@ describe('sp-config', () => {
         errorList.calls[0].should.equal('Required string env var "MISSING_ENV" was not supplied.');
       });
 
-      it('string with passing regex validation should be read and log success', () => {
+      it('string with passing regex validator should be read and log success', () => {
         const INVALID_STRING = 'INVALID_STRING';
         source[INVALID_STRING] = "too long";
 
-        conf.readString(INVALID_STRING, {validation: /^.{1,5}$/});
+        conf.readString(INVALID_STRING, {validator: /^.{1,5}$/});
 
         conf.missingEnvVars.should.eq(true);
         logList.calls.length.should.eq(0);
@@ -86,11 +86,11 @@ describe('sp-config', () => {
         errorList.calls[0].should.equal('Expected env var "INVALID_STRING" to be match pattern "/^.{1,5}$/" but was "too long" and did not.');
       });
 
-      it('string with failing regex validation should set missingEnvVars to true and log', () => {
+      it('string with failing regex validator should set missingEnvVars to true and log', () => {
         const VALID_STRING = 'VALID_STRING';
         source[VALID_STRING] = "nice";
 
-        const validString = conf.readString(VALID_STRING, {validation: /^.{1,5}$/});
+        const validString = conf.readString(VALID_STRING, {validator: /^.{1,5}$/});
 
         validString.should.equal('nice');
         logList.calls.length.should.eq(1);
@@ -102,7 +102,7 @@ describe('sp-config', () => {
         const INVALID_STRING = 'INVALID_STRING';
         source[INVALID_STRING] = "too long";
 
-        conf.readString(INVALID_STRING, {validation: "/^.{1,5}$/"});
+        conf.readString(INVALID_STRING, {validator: "/^.{1,5}$/"});
 
         errorList.calls[0].should.equal('Expected env var "INVALID_STRING" to be match pattern "/^.{1,5}$/" but was "too long" and did not.');
         conf.missingEnvVars.should.eq(true);
@@ -192,6 +192,141 @@ describe('sp-config', () => {
         errorList.calls.length.should.eq(1);
         errorList.calls[0].should.equal('Required password env var "MISSING_ENV" was not supplied.');
       });
+    });
+
+    describe('reading a string with fallbacks', ()=> {
+      it('should be able to read a string from the first opton', () => {
+        const FIRST = 'FIRST';
+        const SECOND = 'SECOND';
+        source[FIRST] = 'alpha';
+        source[SECOND] = 'beta';
+
+        const readFirst = conf.readString([FIRST, SECOND]);
+
+        conf.missingEnvVars.should.eq(false);
+        readFirst.should.equal('alpha');
+        logList.calls.length.should.eq(1);
+        errorList.calls.length.should.eq(0);
+        logList.calls[0].should.equal('Using env var FIRST alpha');
+
+      });
+
+      it('should be able to read a string from the second option if the first is missing', () => {
+        const FIRST = 'FIRST';
+        const SECOND = 'SECOND';
+        source[SECOND] = 'beta';
+
+        const readSecond = conf.readString([FIRST, SECOND]);
+
+        conf.missingEnvVars.should.eq(false);
+        readSecond.should.equal('beta');
+        logList.calls.length.should.eq(2);
+        errorList.calls.length.should.eq(0);
+        logList.calls[0].should.equal('Could not use string "FIRST".');
+        logList.calls[1].should.equal('Using env var SECOND beta');
+
+      });
+
+      it('should give an error if non of the fall backs exist', () => {
+        const FIRST = 'FIRST';
+        const SECOND = 'SECOND';
+
+        conf.readString([FIRST, SECOND]);
+
+        conf.missingEnvVars.should.eq(true);
+        logList.calls.length.should.eq(2);
+        errorList.calls.length.should.eq(1);
+        logList.calls[0].should.equal('Could not use string "FIRST".');
+        logList.calls[1].should.equal('Could not use string "SECOND".');
+        errorList.calls[0].should.equal('At least one of required strings "FIRST" or "SECOND" was not supplied.');
+
+      });
+
+      it('should use default if non of the fall backs exist', () => {
+        const FIRST = 'FIRST';
+        const SECOND = 'SECOND';
+
+        const readFirstSecond = conf.readString([FIRST, SECOND], {defaultValue: 'gamma'});
+
+        conf.missingEnvVars.should.eq(false);
+        readFirstSecond.should.equal('gamma');
+        logList.calls.length.should.eq(3);
+        errorList.calls.length.should.eq(0);
+        logList.calls[0].should.equal('Could not use string "FIRST".');
+        logList.calls[1].should.equal('Could not use string "SECOND".');
+        logList.calls[2].should.equal(`Using default for [ 'FIRST', 'SECOND' ] gamma`);
+      });
+
+      it('should be able to read a string from the second option if the first is non valid', () => {
+        const FIRST = 'FIRST';
+        const SECOND = 'SECOND';
+        source[FIRST] = 'alpha';
+        source[SECOND] = 'beta';
+
+        const readSecond = conf.readString([FIRST, SECOND], {validator: /^b.+$/});
+
+        conf.missingEnvVars.should.eq(false);
+        readSecond.should.equal('beta');
+        logList.calls.length.should.eq(2);
+        errorList.calls.length.should.eq(0);
+        logList.calls[0].should.equal('Could not use string "FIRST".');
+        logList.calls[1].should.equal('Using env var SECOND beta');
+
+      });
+    });
+
+    describe('reading a number with fallbacks', ()=> {
+      it('should be able to read a number from the second option if the first is missing', () => {
+        const FIRST = 'FIRST';
+        const SECOND = 'SECOND';
+        source[SECOND] = '2';
+
+        const readSecond = conf.readNumber([FIRST, SECOND]);
+
+        conf.missingEnvVars.should.eq(false);
+        readSecond.should.equal(2);
+        logList.calls.length.should.eq(2);
+        errorList.calls.length.should.eq(0);
+        logList.calls[0].should.equal('Could not use number "FIRST".');
+        logList.calls[1].should.equal('Using env var SECOND 2');
+
+      });
+
+      it('should be able to read a number from the second option if the first is non valid', () => {
+        const FIRST = 'FIRST';
+        const SECOND = 'SECOND';
+        source[FIRST] = 'cheese';
+        source[SECOND] = '2';
+
+        const readSecond = conf.readNumber([FIRST, SECOND]);
+
+        conf.missingEnvVars.should.eq(false);
+        readSecond.should.equal(2);
+        logList.calls.length.should.eq(2);
+        errorList.calls.length.should.eq(0);
+        logList.calls[0].should.equal('Could not use number "FIRST".');
+        logList.calls[1].should.equal('Using env var SECOND 2');
+
+      });
+    });
+
+    describe('reading a password with fallbacks', ()=> {
+      it('should be able to read a number from the second option if the first is missing', () => {
+        const FIRST = 'FIRST';
+        const SECOND = 'SECOND';
+        source[SECOND] = 'supercalifragilisticexpialidocious';
+
+        const readSecond = conf.readPassword([FIRST, SECOND]);
+
+        conf.missingEnvVars.should.eq(false);
+        readSecond.should.equal('supercalifragilisticexpialidocious');
+        logList.calls.length.should.eq(2);
+        errorList.calls.length.should.eq(0);
+        logList.calls[0].should.equal('Could not use password "FIRST".');
+        logList.calls[1].should.equal('Using env var SECOND sup****************************ous');
+
+      });
+
     });
   });
 });

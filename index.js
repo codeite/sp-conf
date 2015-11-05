@@ -16,12 +16,14 @@ SpConf.readString = function(name, options) {
 };
 
 function readString(name, options, owner) {
+  if(Array.isArray(name)) return _tryEach(readString, 'string', name, options, owner);
+
   options = _cleanOptions(options, owner && owner.defaultOptions);
   const val = options.source[name];
   if(val !== undefined) {
 
-    if(_failedValidation(options.validation, val)) {
-      options.error(`Expected env var "${name}" to be match pattern "${options.validation}" but was "${val}" and did not.`);
+    if(_failedvalidator(options.validator, val)) {
+      options.error(`Expected env var "${name}" to be match pattern "${options.validator}" but was "${val}" and did not.`);
       owner.missingEnvVars = true;
     } else {
       options.log('Using env var', name, val);
@@ -42,8 +44,9 @@ SpConf.prototype.readNumber = function(name, options) {
 SpConf.readNumber = function(name, options) {
   return readNumber(name, options, module.exports);
 };
-
 function readNumber(name, options, owner) {
+  if(Array.isArray(name)) return _tryEach(readNumber, 'number', name, options, owner);
+
   options = _cleanOptions(options, owner && owner.defaultOptions);
   const val = options.source[name];
   if(val !== undefined) {
@@ -70,8 +73,9 @@ SpConf.prototype.readPassword = function(name, options) {
 SpConf.readPassword = function(name, options) {
   return readPassword(name, options, module.exports);
 };
-
 function readPassword(name, options, owner) {
+  if(Array.isArray(name)) return _tryEach(readPassword, 'password', name, options, owner);
+
   options = _cleanOptions(options, owner && owner.defaultOptions);
   const val = options.source[name];
   if(val !== undefined) {
@@ -101,7 +105,33 @@ function _obfuscate(str) {
   return start + middle + end;
 }
 
-function _failedValidation(validator, val) {
+function _tryEach(func, type, names, options, owner) {
+  var found = null;
+
+  const cleanOptions = _cleanOptions(options, owner && owner.defaultOptions);
+  names.find(name => {
+    const innerOptions = Object.assign({}, options, {error: _=>null});
+    delete innerOptions.defaultValue;
+    const innerOwner = Object.assign({}, owner);
+
+    found = func(name, innerOptions, innerOwner);
+
+    if(found) return found;
+    cleanOptions.log(`Could not use ${type} "${name}".`);
+  });
+
+  if(found) return found;
+
+  if(cleanOptions.defaultValue !== undefined) {
+    cleanOptions.log('Using default for', names, cleanOptions.defaultValue);
+    return cleanOptions.defaultValue;
+  }
+
+  owner.missingEnvVars = true;
+  cleanOptions.error(`At least one of required ${type}s "${names.join('" or "')}" was not supplied.`);
+}
+
+function _failedvalidator(validator, val) {
   if(!validator) return false;
 
   if(typeof validator === 'string') validator = new RegExp(validator);
@@ -111,10 +141,11 @@ function _failedValidation(validator, val) {
 
 function _cleanOptions(options, defaultOptions){
   if(typeof options === 'string') options = {
-    "default": options
+    "defaultValue": options
   };
 
   if(options === undefined) options = {};
+  if(defaultOptions) options = Object.assign({}, defaultOptions, options);
 
   if(options.source === undefined) options.source = process.env;
 
@@ -126,6 +157,5 @@ function _cleanOptions(options, defaultOptions){
     console.error.apply(console, arguments);
   };
 
-  if(defaultOptions) options = Object.assign(options, defaultOptions);
   return options;
 }
