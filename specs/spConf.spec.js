@@ -194,6 +194,21 @@ describe('sp-config', () => {
       });
     });
 
+    describe('reading a url', ()=> {
+      it('should be able to read a url and log success while obfuscating passwords', () => {
+        const HAPPY_PATH = 'HAPPY_PATH';
+        source[HAPPY_PATH] = 'https://username:password@host.com:123/path?q=v#hash';
+
+        const happyPath = conf.readUrl(HAPPY_PATH);
+
+        happyPath.should.equal('https://username:password@host.com:123/path?q=v#hash');
+        conf.missingEnvVars.should.eq(false);
+        logList.calls.length.should.eq(1);
+        errorList.calls.length.should.eq(0);
+        logList.calls[0].should.equal('Using env var HAPPY_PATH https://username:p******d@host.com:123/path?q=v#hash');
+      });
+    });
+
     describe('reading a string with fallbacks', ()=> {
       it('should be able to read a string from the first opton', () => {
         const FIRST = 'FIRST';
@@ -330,6 +345,64 @@ describe('sp-config', () => {
     });
   });
 });
+
+describe('obfuscate', () => {
+  var conf;
+
+  beforeEach(() => {
+    conf = require('../index.js');
+  });
+
+  describe('totally masking passwords less than 6 characters long', () => {
+    [
+      {in:'1', out:'*'},
+      {in:'12', out:'**'},
+      {in:'123', out:'***'},
+      {in:'1234', out:'****'},
+      {in:'12345', out:'*****'}
+    ].forEach(testCase => {
+      it('should mask '+testCase.in+' to '+testCase.out, () => {
+        const obfusicated = conf.obfuscate(testCase.in);
+        obfusicated.should.equal(testCase.out);
+      })
+    });
+  });
+
+  describe('partial masking passwords 6 characters or longer', () => {
+    [
+      {in:'123456', out:'1****6'},
+      {in:'1234567', out:'1*****7'},
+      {in:'12345678', out:'1******8'},
+      {in:'123456789', out:'1*******9'},
+      {in:'123456789A', out:'1********A'},
+      {in:'123456789AB', out:'1*********B'},
+      {in:'123456789ABC', out:'12********BC'},
+      {in:'123456789ABCD', out:'12*********CD'},
+      {in:'123456789ABCDE', out:'12**********DE'},
+      {in:'123456789ABCDEF', out:'12***********EF'}
+    ].forEach(testCase => {
+      it('should mask '+testCase.in+' to '+testCase.out, () => {
+        const conf = require('../index.js');
+        const obfusicated = conf.obfuscate(testCase.in);
+        obfusicated.should.equal(testCase.out);
+      })
+    });
+  });
+
+  describe('obfusicate password in url', () => {
+    it('should totally mask password less than 6 chars', () => {
+      const url = 'http://user:pass@host.com/';
+      const obfusicated = conf.obfuscateAuth(url);
+      obfusicated.should.equal('http://user:****@host.com/')
+    });
+
+    it('should partial mask password 6 chars or longer', () => {
+      const url = 'http://username:password@host.com/';
+      const obfusicated = conf.obfuscateAuth(url);
+      obfusicated.should.equal('http://username:p******d@host.com/')
+    });
+  });
+})
 
 describe('SpConfig', () => {
   it('should be able to use two validators independently', () => {

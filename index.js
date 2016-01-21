@@ -1,5 +1,7 @@
 'use strict';
 
+const urlLib = require('url');
+
 module.exports = SpConf;
 
 function SpConf(defaultOptions) {
@@ -90,6 +92,37 @@ function readPassword(name, options, owner) {
   }
 }
 
+SpConf.prototype.readUrl = function(name, options) {
+  return readUrl(name, options, this);
+};
+SpConf.readUrl = function(name, options) {
+  return readUrl(name, options, module.exports);
+};
+
+function readUrl(name, options, owner) {
+  if(Array.isArray(name)) return _tryEach(readUrl, 'url', name, options, owner);
+
+  options = _cleanOptions(options, owner && owner.defaultOptions);
+  const val = options.source[name];
+  if(val !== undefined) {
+
+    if(_failedvalidator(options.validator, val)) {
+      options.error(`Expected env var "${name}" to be match pattern "${options.validator}" but was "${_obfuscateAuth(val)}" and did not.`);
+      owner.missingEnvVars = true;
+    } else {
+      options.log('Using env var', name, _obfuscateAuth(val));
+      return val;
+    }
+  } else if(options.defaultValue !== undefined) {
+    options.log('Using default', name, _obfuscateAuth(options.defaultValue));
+    return options.defaultValue;
+  } else {
+    options.error(`Required url env var "${name}" was not supplied.`);
+    owner.missingEnvVars = true;
+  }
+}
+
+SpConf.obfuscate = _obfuscate;
 function _obfuscate(str) {
   if(!str) return str;
 
@@ -103,6 +136,21 @@ function _obfuscate(str) {
   const middle = new Array(str.length-((showBits*2)-1)).join("*");
 
   return start + middle + end;
+}
+
+SpConf.obfuscateAuth = _obfuscateAuth;
+function _obfuscateAuth(url) {
+  url = urlLib.parse(url);
+
+  const bits = url.auth.split(':');
+
+  if(bits[1]) {
+    bits[1] = _obfuscate(bits[1]);
+    url.auth = bits.join(':');
+    return url.format();
+  }
+
+  return url;
 }
 
 function _tryEach(func, type, names, options, owner) {
