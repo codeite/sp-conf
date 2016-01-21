@@ -142,15 +142,16 @@ SpConf.obfuscateAuth = _obfuscateAuth;
 function _obfuscateAuth(url) {
   url = urlLib.parse(url);
 
-  const bits = url.auth.split(':');
+  if(url.auth && url.auth.split) {
+    const bits = url.auth.split(':');
 
-  if(bits[1]) {
-    bits[1] = _obfuscate(bits[1]);
-    url.auth = bits.join(':');
-    return url.format();
+    if(bits[1]) {
+      bits[1] = _obfuscate(bits[1]);
+      url.auth = bits.join(':');
+    }
   }
 
-  return url;
+  return url.format();
 }
 
 function _tryEach(func, type, names, options, owner) {

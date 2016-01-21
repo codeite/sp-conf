@@ -195,17 +195,55 @@ describe('sp-config', () => {
     });
 
     describe('reading a url', ()=> {
-      it('should be able to read a url and log success while obfuscating passwords', () => {
+      it('should be able to read a url and log success', () => {
+        const HAPPY_PATH = 'HAPPY_PATH';
+        source[HAPPY_PATH] = 'https://host.com:123/path?q=v#hash';
+
+        const happyPath = conf.readUrl(HAPPY_PATH);
+
+        happyPath.should.equal('https://host.com:123/path?q=v#hash');
+        conf.missingEnvVars.should.eq(false);
+        logList.calls.length.should.eq(1);
+        errorList.calls.length.should.eq(0);
+        logList.calls[0].should.equal('Using env var HAPPY_PATH https://host.com:123/path?q=v#hash');
+      });
+
+      it('should not obfuscate usernames', () => {
+        const HAPPY_PATH = 'HAPPY_PATH';
+        source[HAPPY_PATH] = 'https://username@host.com:123/path?q=v#hash';
+
+        const happyPath = conf.readUrl(HAPPY_PATH);
+        logList.calls[0].should.equal('Using env var HAPPY_PATH https://username@host.com:123/path?q=v#hash');
+      });
+
+      it('should be able to obfuscating passwords', () => {
         const HAPPY_PATH = 'HAPPY_PATH';
         source[HAPPY_PATH] = 'https://username:password@host.com:123/path?q=v#hash';
 
         const happyPath = conf.readUrl(HAPPY_PATH);
+        logList.calls[0].should.equal('Using env var HAPPY_PATH https://username:p******d@host.com:123/path?q=v#hash');
+      });
 
-        happyPath.should.equal('https://username:password@host.com:123/path?q=v#hash');
-        conf.missingEnvVars.should.eq(false);
+      it('should be able to use a default value for a url and report', () => {
+        const MISSING_BUT_DEFAULT = 'MISSING_BUT_DEFAULT';
+
+        const missingButDefault = conf.readUrl(MISSING_BUT_DEFAULT, {defaultValue: 'http://username:password@host.com/path'});
+
+        missingButDefault.should.equal('http://username:password@host.com/path');
         logList.calls.length.should.eq(1);
         errorList.calls.length.should.eq(0);
-        logList.calls[0].should.equal('Using env var HAPPY_PATH https://username:p******d@host.com:123/path?q=v#hash');
+        logList.calls[0].should.equal('Using default MISSING_BUT_DEFAULT http://username:p******d@host.com/path');
+      });
+
+      it('missing url env vars should set missingEnvVars to true and log', () => {
+        const MISSING_ENV = 'MISSING_ENV';
+
+        const sadPath = conf.readUrl(MISSING_ENV);
+
+        conf.missingEnvVars.should.eq(true);
+        logList.calls.length.should.eq(0);
+        errorList.calls.length.should.eq(1);
+        errorList.calls[0].should.equal('Required url env var "MISSING_ENV" was not supplied.');
       });
     });
 
@@ -389,7 +427,19 @@ describe('obfuscate', () => {
     });
   });
 
-  describe('obfusicate password in url', () => {
+  describe('a url', () => {
+    it('should not mind if auth is missing', () => {
+      const url = 'http://host.com/';
+      const obfusicated = conf.obfuscateAuth(url);
+      obfusicated.should.equal('http://host.com/')
+    });
+
+    it('should not obfuscate username', () => {
+      const url = 'http://username@host.com/';
+      const obfusicated = conf.obfuscateAuth(url);
+      obfusicated.should.equal('http://username@host.com/')
+    });
+
     it('should totally mask password less than 6 chars', () => {
       const url = 'http://user:pass@host.com/';
       const obfusicated = conf.obfuscateAuth(url);
