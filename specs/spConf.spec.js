@@ -374,6 +374,12 @@ describe('sp-config', () => {
       })
     })
   })
+
+  describe('extra features', () => {
+    it('must export deepFreeze functionality', () => {
+      conf.makeClonableAndDeepFreeze.must.be.a.function()
+    })
+  })
 })
 
 describe('obfuscate', () => {

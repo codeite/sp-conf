@@ -2,7 +2,11 @@
 
 const urlLib = require('url')
 
+const deepFreeze = require('./deepFreeze')
+
 module.exports = SpConf
+
+SpConf.makeClonableAndDeepFreeze = deepFreeze.makeClonableAndDeepFreeze
 
 function SpConf (defaultOptions) {
   this.defaultOptions = _cleanOptions(defaultOptions)

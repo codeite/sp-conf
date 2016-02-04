@@ -29,3 +29,11 @@ readString - Read a string not applying any special rules
 readPassword - Read a string but will obfuscate when logging the value out
 
 readUrl - Read a URL and will obfuscate the password if the URL contains one.
+
+## Deep freeze
+
+deepFreezeAndMakeClonable
+This will freeze all the properties on your object as well as sub objects.
+It will also add a cloneAndRefreeze property to the object that, when called, will create a clone. The clone will also be frozen.
+
+If you want to mutate the clone, when calling cloneAndRefreeze pass a callback with an argument that gets access to the clone before it is frozen.
