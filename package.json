@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thecodeite/sp-conf.git"
+    "url": "git+https://github.com/codeite/sp-conf.git"
   },
   "keywords": [
     "configuration",
@@ -17,9 +17,9 @@
   "author": "Sam Plews <the@codeite.com> (https://github.com/thecodeite)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/thecodeite/sp-conf/issues"
+    "url": "https://github.com/codeite/sp-conf/issues"
   },
-  "homepage": "https://github.com/thecodeite/sp-conf#readme",
+  "homepage": "https://github.com/codeite/sp-conf#readme",
   "devDependencies": {
     "chai": "^3.4.0",
     "mocha": "^2.3.3"
