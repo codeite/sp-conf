@@ -95,6 +95,29 @@ function readPassword (name, options, owner) {
   }
 }
 
+SpConf.prototype.readCertificate = function (name, options) {
+  return readCertificate(name, options, this)
+}
+SpConf.readCertificate = function (name, options) {
+  return readCertificate(name, options, module.exports)
+}
+function readCertificate (name, options, owner) {
+  if (Array.isArray(name)) return _tryEach(readCertificate, 'certificate', name, options, owner)
+
+  options = _cleanOptions(options, owner && owner.defaultOptions)
+  const val = options.source[name]
+  if (val !== undefined) {
+    options.log('Using env var', name, _obfuscateCertificate(val))
+    return val
+  } else if (options.defaultValue !== undefined) {
+    options.log('Using default', name, _obfuscateCertificate(options.defaultValue))
+    return options.defaultValue
+  } else {
+    options.error(`Required certificate env var "${name}" was not supplied.`)
+    owner.missingEnvVars = true
+  }
+}
+
 SpConf.prototype.readUrl = function (name, options) {
   return readUrl(name, options, this)
 }
@@ -153,6 +176,39 @@ function _obfuscateAuth (url) {
   }
 
   return url.format()
+}
+
+const certificateHeader = '-----BEGIN CERTIFICATE-----'
+const certificateFooter = '-----END CERTIFICATE-----'
+
+SpConf.obfuscateCertificate = _obfuscateCertificate
+function _obfuscateCertificate (certificate) {
+  if (!certificate) return certificate
+
+  const headerPos = certificate.indexOf(certificateHeader)
+  if (headerPos !== -1) {
+    certificate = certificate.substr(headerPos + certificateHeader.length)
+  }
+
+  const footerPos = certificate.indexOf(certificateFooter)
+  if (footerPos !== -1) {
+    certificate = certificate.substr(0, footerPos)
+  }
+
+  certificate = certificate.split(/\s+/).join('')
+
+  let showBits = Math.floor(certificate.length / 6)
+  if (showBits > 3) showBits = 3
+
+  const start = certificate.substr(0, showBits)
+  const end = certificate.substr(-showBits, showBits)
+
+  let middle = new Array(certificate.length - ((showBits * 2) - 1)).join('*')
+  if (middle.length > 26) {
+    middle = '**********...**********'
+  }
+
+  return start + middle + end
 }
 
 function _tryEach (func, type, names, options, owner) {

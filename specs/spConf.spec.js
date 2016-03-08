@@ -194,6 +194,42 @@ describe('sp-config', () => {
       })
     })
 
+    describe('reading a certificate', () => {
+      it('must be able to read a certificate and log success with obfuscation', () => {
+        const HAPPY_PATH = 'HAPPY_PATH'
+        source[HAPPY_PATH] = '-----BEGIN CERTIFICATE-----\nABCDEF1234567890\n-----END CERTIFICATE-----'
+
+        const happyPath = conf.readCertificate(HAPPY_PATH)
+
+        happyPath.must.equal('-----BEGIN CERTIFICATE-----\nABCDEF1234567890\n-----END CERTIFICATE-----')
+        logList.calls.length.must.equal(1)
+        errorList.calls.length.must.equal(0)
+        logList.calls[0].must.equal('Using env var HAPPY_PATH AB************90')
+      })
+
+      it('must be able to use a default value for a certificate and report with obfuscation', () => {
+        const MISSING_BUT_DEFAULT_PASSWORD = 'MISSING_BUT_DEFAULT_PASSWORD'
+
+        const missingButDefault = conf.readCertificate(MISSING_BUT_DEFAULT_PASSWORD, {defaultValue: 'leopard'})
+
+        missingButDefault.must.equal('leopard')
+        logList.calls.length.must.equal(1)
+        errorList.calls.length.must.equal(0)
+        logList.calls[0].must.equal('Using default MISSING_BUT_DEFAULT_PASSWORD l*****d')
+      })
+
+      it('missing certificate env vars must set missingEnvVars to true and log', () => {
+        const MISSING_ENV = 'MISSING_ENV'
+
+        conf.readCertificate(MISSING_ENV)
+
+        conf.missingEnvVars.must.equal(true)
+        logList.calls.length.must.equal(0)
+        errorList.calls.length.must.equal(1)
+        errorList.calls[0].must.equal('Required certificate env var "MISSING_ENV" was not supplied.')
+      })
+    })
+
     describe('reading a url', () => {
       it('must be able to read a url and log success', () => {
         const HAPPY_PATH = 'HAPPY_PATH'
@@ -448,6 +484,32 @@ describe('obfuscate', () => {
       const url = 'http://username:password@host.com/'
       const obfusicated = conf.obfuscateAuth(url)
       obfusicated.must.equal('http://username:p******d@host.com/')
+    })
+  })
+
+  describe('a certificate', () => {
+    it('must remove the header, footer and most of the body', () => {
+      const certificate = '-----BEGIN CERTIFICATE-----\nABCDEF1234567890\n-----END CERTIFICATE-----'
+      const obfusicated = conf.obfuscateCertificate(certificate)
+      obfusicated.must.equal('AB************90')
+    })
+
+    it('must combine key onto one line', () => {
+      const certificate = '-----BEGIN CERTIFICATE-----\nABCDEF12\n34567890\n-----END CERTIFICATE-----'
+      const obfusicated = conf.obfuscateCertificate(certificate)
+      obfusicated.must.equal('AB************90')
+    })
+
+    it('must not mind of the footer and/or header are missing', () => {
+      const certificate = `ABCDEF1234567890`
+      const obfusicated = conf.obfuscateCertificate(certificate)
+      obfusicated.must.equal('AB************90')
+    })
+
+    it('must keep the output less than 30 characters', () => {
+      const certificate = `0123456789012345678901234567890123456789`
+      const obfusicated = conf.obfuscateCertificate(certificate)
+      obfusicated.must.equal('012**********...**********789')
     })
   })
 })
