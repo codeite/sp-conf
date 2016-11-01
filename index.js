@@ -72,6 +72,38 @@ function readNumber (name, options, owner) {
   }
 }
 
+SpConf.prototype.readBool = function (name, options) {
+  return readBool(name, options, this)
+}
+SpConf.readBool = function (name, options) {
+  return readBool(name, options, module.exports)
+}
+function readBool (name, options, owner) {
+  if (Array.isArray(name)) return _tryEach(readBool, 'bool', name, options, owner)
+
+  options = _cleanOptions(options, owner && owner.defaultOptions)
+  const val = options.source[name]
+  if (val !== undefined) {
+    const valLower = val.toLowerCase()
+    if(valLower === 't' || valLower === 'true' || valLower === 'on' || valLower === '1') {
+      options.log('Using env var', name, 'true')
+      return true
+    } else if(valLower === 'f' || valLower === 'false'|| valLower === 'off' || valLower === '0') {
+      options.log('Using env var', name, 'false')
+      return false
+    } else {
+      options.error(`Expected env var "${name}" to be a bool but was "${val}".`)
+      owner.missingEnvVars = true
+    }
+  } else if (options.defaultValue !== undefined) {
+    options.log('Using default env var', name, options.defaultValue)
+    return options.defaultValue
+  } else {
+    options.error(`Required numeric env var "${name}" was not supplied.`)
+    owner.missingEnvVars = true
+  }
+}
+
 SpConf.prototype.readPassword = function (name, options) {
   return readPassword(name, options, this)
 }

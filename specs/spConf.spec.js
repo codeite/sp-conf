@@ -126,12 +126,12 @@ describe('sp-config', () => {
       it('must be able to use a default value for a number and report', () => {
         const MISSING_BUT_DEFAULT_NUMBER = 'MISSING_BUT_DEFAULT_NUMBER'
 
-        const missingButDefaultNumber = conf.readString(MISSING_BUT_DEFAULT_NUMBER, {defaultValue: 88})
+        const missingButDefaultNumber = conf.readNumber(MISSING_BUT_DEFAULT_NUMBER, {defaultValue: 88})
 
         missingButDefaultNumber.must.equal(88)
         logList.calls.length.must.equal(1)
         errorList.calls.length.must.equal(0)
-        logList.calls[0].must.equal('Using default MISSING_BUT_DEFAULT_NUMBER 88')
+        logList.calls[0].must.equal('Using default env var MISSING_BUT_DEFAULT_NUMBER 88')
       })
 
       it('missing number env vars must set missingEnvVars to true and log', () => {
@@ -155,6 +155,82 @@ describe('sp-config', () => {
         logList.calls.length.must.equal(0)
         errorList.calls.length.must.equal(1)
         errorList.calls[0].must.equal('Expected env var "NOT_A_NUMBER" to be numeric but was "elephant".')
+      })
+    })
+
+    describe('reading a bool', () => {
+      it('must be able to read a bool and log success', () => {
+        const A_GOOD_BOOL = 'A_GOOD_BOOL'
+        source[A_GOOD_BOOL] = 'true'
+
+        const aGoodBool = conf.readBool(A_GOOD_BOOL)
+
+        aGoodBool.must.equal(true)
+        logList.calls.length.must.equal(1)
+        errorList.calls.length.must.equal(0)
+        logList.calls[0].must.equal('Using env var A_GOOD_BOOL true')
+      })
+
+      ;['t', 'T', 'true', 'TRUE', 'True', 'TrUe', 'on', 'ON', 'On', '1'].forEach(testCase => {
+        it(`must read "${testCase}" a "true" bool and log success`, () => {
+          const A_GOOD_BOOL = 'A_GOOD_BOOL'
+          source[A_GOOD_BOOL] = testCase
+
+          const aGoodBool = conf.readBool(A_GOOD_BOOL)
+
+          aGoodBool.must.equal(true)
+          logList.calls.length.must.equal(1)
+          errorList.calls.length.must.equal(0)
+          logList.calls[0].must.equal('Using env var A_GOOD_BOOL true')
+        })
+      })
+
+      ;['f', 'F', 'false', 'FALSE', 'False', 'FaLsE', 'off', 'OFF', 'Off', '0'].forEach(testCase => {
+        it(`must read "${testCase}" a "false" bool and log success`, () => {
+          const A_GOOD_BOOL = 'A_GOOD_BOOL'
+          source[A_GOOD_BOOL] = testCase
+
+          const aGoodBool = conf.readBool(A_GOOD_BOOL)
+
+          aGoodBool.must.equal(false)
+          logList.calls.length.must.equal(1)
+          errorList.calls.length.must.equal(0)
+          logList.calls[0].must.equal('Using env var A_GOOD_BOOL false')
+        })
+      })
+
+      it('must be able to use a default value for a bool and report', () => {
+        const MISSING_BUT_DEFAULT_BOOL = 'MISSING_BUT_DEFAULT_BOOL'
+
+        const missingButDefaultBool = conf.readBool(MISSING_BUT_DEFAULT_BOOL, {defaultValue: true})
+
+        missingButDefaultBool.must.equal(true)
+        logList.calls.length.must.equal(1)
+        errorList.calls.length.must.equal(0)
+        logList.calls[0].must.equal('Using default env var MISSING_BUT_DEFAULT_BOOL true')
+      })
+
+      it('missing bool env vars must set missingEnvVars to true and log', () => {
+        const MISSING_ENV = 'MISSING_ENV'
+
+        conf.readBool(MISSING_ENV)
+
+        conf.missingEnvVars.must.equal(true)
+        logList.calls.length.must.equal(0)
+        errorList.calls.length.must.equal(1)
+        errorList.calls[0].must.equal('Required numeric env var "MISSING_ENV" was not supplied.')
+      })
+
+      it('badly formated number must set missingEnvVars to true and log', () => {
+        const NOT_A_BOOL = 'NOT_A_BOOL'
+        source[NOT_A_BOOL] = 'elephant'
+
+        conf.readBool(NOT_A_BOOL)
+
+        conf.missingEnvVars.must.equal(true)
+        logList.calls.length.must.equal(0)
+        errorList.calls.length.must.equal(1)
+        errorList.calls[0].must.equal('Expected env var "NOT_A_BOOL" to be a bool but was "elephant".')
       })
     })
 
