@@ -67,9 +67,9 @@ readPassword - Read a string but will obfuscate when logging the value out
 readUrl - Read a URL and will obfuscate the password if the URL contains one.
 
 readBool - Read a boolean and complain if it's not valid. Epected characters are:
-true - "true", "t", "on", "1"
-false - "false", "f", "off", "0"
-It is not case sensitive so, for exaple, both "True" and "TRUE" work just fine
+ * truthy values - "true", "t", "on", "1"
+ * falsy falues - "false", "f", "off", "0"
+ * It is not case sensitive so, for exaple, both "True" and "TRUE" work just fine
 
 ## Deep freeze
 
