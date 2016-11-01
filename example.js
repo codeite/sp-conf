@@ -10,7 +10,8 @@ const myconfig = {
     host: conf.readString('DB_HOST_IP', {validator: regexForIpV4Address}),
     port: conf.readNumber('DB_PORT'),
     username: conf.readString('DB_USERNAME'),
-    password: conf.readPassword('DB_PASSWORD')
+    password: conf.readPassword('DB_PASSWORD'),
+    keepConnectionOpen: conf.readBool('KEEP_CONNECTION_OPEN'),
   }
 }
 

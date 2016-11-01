@@ -4,15 +4,51 @@
 
 SimPle CONFig
 
-## About
-
 A small component for reading config.
 It will log all the variables your are reading so you can see what values your app it using.
 It will also check where any variables are missing and allow your to respond.
 
+## Gettings Started
+
+```
+npm install sp-config --save
+```
+
 ## How to use
 
 Check out example.js that shows an example of using it.
+```javascript
+const conf = require('sp-conf')
+
+const regexForIpV4Address = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/
+
+const myconfig = {
+  port: conf.readNumber('PORT', {defaultValue: 8080}),
+  user: conf.readString(['CURRENT_USER', 'DEFAULT_USER']),
+  serviceUrl: conf.readUrl('SERVICE_URL'),
+  database: {
+    host: conf.readString('DB_HOST_IP', {validator: regexForIpV4Address}),
+    port: conf.readNumber('DB_PORT'),
+    username: conf.readString('DB_USERNAME'),
+    password: conf.readPassword('DB_PASSWORD'),
+    keepConnectionOpen: conf.readBool('KEEP_CONNECTION_OPEN'),
+  }
+}
+
+conf.deepFreezeAndMakeClonable(myconfig)
+
+if (conf.missingEnvVars) {
+  console.error('Some required env vars were missing. Terminating')
+  process.exit(1)
+}
+
+const mockConfig = conf.cloneAndRefreeze(x => x.user = 'test_user')
+
+// mockConfig would be frozan and mockConfig.user would contain 'test_user'
+console.log(mockConfig.user)
+
+module.exports = myconfig
+```
 
 ## Options common to all methods
 
@@ -29,6 +65,11 @@ readString - Read a string not applying any special rules
 readPassword - Read a string but will obfuscate when logging the value out
 
 readUrl - Read a URL and will obfuscate the password if the URL contains one.
+
+readBool - Read a boolean and complain if it's not valid. Epected characters are:
+ * truthy values - "true", "t", "on", "1"
+ * falsy falues - "false", "f", "off", "0"
+ * It is not case sensitive so, for exaple, both "True" and "TRUE" work just fine
 
 ## Deep freeze
 
