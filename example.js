@@ -11,7 +11,7 @@ const myconfig = {
     port: conf.readNumber('DB_PORT'),
     username: conf.readString('DB_USERNAME'),
     password: conf.readPassword('DB_PASSWORD'),
-    keepConnectionOpen: conf.readBool('KEEP_CONNECTION_OPEN'),
+    keepConnectionOpen: conf.readBool('KEEP_CONNECTION_OPEN')
   }
 }
 

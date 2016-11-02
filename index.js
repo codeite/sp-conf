@@ -85,10 +85,10 @@ function readBool (name, options, owner) {
   const val = options.source[name]
   if (val !== undefined) {
     const valLower = val.toLowerCase()
-    if(valLower === 't' || valLower === 'true' || valLower === 'on' || valLower === '1') {
+    if (valLower === 't' || valLower === 'true' || valLower === 'on' || valLower === '1') {
       options.log('Using env var', name, 'true')
       return true
-    } else if(valLower === 'f' || valLower === 'false'|| valLower === 'off' || valLower === '0') {
+    } else if (valLower === 'f' || valLower === 'false' || valLower === 'off' || valLower === '0') {
       options.log('Using env var', name, 'false')
       return false
     } else {
