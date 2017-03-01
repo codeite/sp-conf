@@ -11,7 +11,7 @@ It will also check where any variables are missing and allow your to respond.
 ## Gettings Started
 
 ```
-npm install sp-config --save
+npm install sp-conf --save
 ```
 
 ## How to use
