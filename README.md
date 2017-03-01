@@ -11,7 +11,7 @@ It will also check where any variables are missing and allow your to respond.
 ## Gettings Started
 
 ```
-npm install sp-config --save
+npm install sp-conf --save
 ```
 
 ## How to use
@@ -35,7 +35,7 @@ const myconfig = {
   }
 }
 
-conf.deepFreezeAndMakeClonable(myconfig)
+conf.makeClonableAndDeepFreeze(myconfig)
 
 if (conf.missingEnvVars) {
   console.error('Some required env vars were missing. Terminating')
