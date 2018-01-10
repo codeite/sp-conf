@@ -31,11 +31,11 @@ function readString (name, options, owner) {
       options.error(`Expected env var "${name}" to be match pattern "${options.validator}" but was "${val}" and did not.`)
       owner.missingEnvVars = true
     } else {
-      options.log('Using env var', name, val)
+      options.log(`Using env var ${name} ${val}`)
       return val
     }
   } else if (options.defaultValue !== undefined) {
-    options.log('Using default', name, options.defaultValue)
+    options.log(`Using default ${name} ${options.defaultValue}`)
     return options.defaultValue
   } else {
     options.error(`Required string env var "${name}" was not supplied.`)
@@ -60,11 +60,11 @@ function readNumber (name, options, owner) {
       options.error(`Expected env var "${name}" to be numeric but was "${val}".`)
       owner.missingEnvVars = true
     } else {
-      options.log('Using env var', name, number)
+      options.log(`Using env var ${name} ${number}`)
       return number
     }
   } else if (options.defaultValue !== undefined) {
-    options.log('Using default env var', name, options.defaultValue)
+    options.log(`Using default env var ${name} ${options.defaultValue}`)
     return options.defaultValue
   } else {
     options.error(`Required numeric env var "${name}" was not supplied.`)
@@ -86,17 +86,17 @@ function readBool (name, options, owner) {
   if (val !== undefined) {
     const valLower = val.toLowerCase()
     if (valLower === 't' || valLower === 'true' || valLower === 'on' || valLower === '1') {
-      options.log('Using env var', name, 'true')
+      options.log(`Using env var ${name} true`)
       return true
     } else if (valLower === 'f' || valLower === 'false' || valLower === 'off' || valLower === '0') {
-      options.log('Using env var', name, 'false')
+      options.log(`Using env var ${name} false`)
       return false
     } else {
       options.error(`Expected env var "${name}" to be a bool but was "${val}".`)
       owner.missingEnvVars = true
     }
   } else if (options.defaultValue !== undefined) {
-    options.log('Using default env var', name, options.defaultValue)
+    options.log(`Using default env var ${name} ${options.defaultValue}`)
     return options.defaultValue
   } else {
     options.error(`Required numeric env var "${name}" was not supplied.`)
@@ -116,10 +116,10 @@ function readPassword (name, options, owner) {
   options = _cleanOptions(options, owner && owner.defaultOptions)
   const val = options.source[name]
   if (val !== undefined) {
-    options.log('Using env var', name, _obfuscate(val))
+    options.log(`Using env var ${name} ${_obfuscate(val)}`)
     return val
   } else if (options.defaultValue !== undefined) {
-    options.log('Using default', name, _obfuscate(options.defaultValue))
+    options.log(`Using default ${name} ${_obfuscate(options.defaultValue)}`)
     return options.defaultValue
   } else {
     options.error(`Required password env var "${name}" was not supplied.`)
@@ -139,10 +139,10 @@ function readCertificate (name, options, owner) {
   options = _cleanOptions(options, owner && owner.defaultOptions)
   const val = options.source[name]
   if (val !== undefined) {
-    options.log('Using env var', name, _obfuscateCertificate(val))
+    options.log(`Using env var ${name} ${_obfuscateCertificate(val)}`)
     return val
   } else if (options.defaultValue !== undefined) {
-    options.log('Using default', name, _obfuscateCertificate(options.defaultValue))
+    options.log(`Using default ${name} ${_obfuscateCertificate(options.defaultValue)}`)
     return options.defaultValue
   } else {
     options.error(`Required certificate env var "${name}" was not supplied.`)
@@ -167,11 +167,11 @@ function readUrl (name, options, owner) {
       options.error(`Expected env var "${name}" to be match pattern "${options.validator}" but was "${_obfuscateAuth(val)}" and did not.`)
       owner.missingEnvVars = true
     } else {
-      options.log('Using env var', name, _obfuscateAuth(val))
+      options.log(`Using env var ${name} ${_obfuscateAuth(val)}`)
       return val
     }
   } else if (options.defaultValue !== undefined) {
-    options.log('Using default', name, _obfuscateAuth(options.defaultValue))
+    options.log(`Using default ${name} ${_obfuscateAuth(options.defaultValue)}`)
     return options.defaultValue
   } else {
     options.error(`Required url env var "${name}" was not supplied.`)
@@ -261,7 +261,7 @@ function _tryEach (func, type, names, options, owner) {
   if (found) return found
 
   if (cleanOptions.defaultValue !== undefined) {
-    cleanOptions.log('Using default for', names, cleanOptions.defaultValue)
+    cleanOptions.log(`Using default for ${names} ${cleanOptions.defaultValue}`)
     return cleanOptions.defaultValue
   }
 

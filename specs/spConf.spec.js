@@ -416,7 +416,7 @@ describe('sp-config', () => {
         errorList.calls.length.must.equal(0)
         logList.calls[0].must.equal('Could not use string "FIRST".')
         logList.calls[1].must.equal('Could not use string "SECOND".')
-        logList.calls[2].must.equal(`Using default for [ 'FIRST', 'SECOND' ] gamma`)
+        logList.calls[2].must.equal(`Using default for FIRST,SECOND gamma`)
       })
 
       it('must be able to read a string from the second option if the first is non valid', () => {

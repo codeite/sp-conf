@@ -56,6 +56,26 @@ defaultValue: The value to use if the specified value is not available
 
 validator: A regular expressing to specify the format of the input value
 
+log: A function that logs about reading env var. E.g. `log: msg => console.log('message:', msg)`
+     Defaults to logging to stdout
+
+error: A function that reports errors while reading env var. E.g. `error: err => console.error('error:', err)`
+       Defaults to logging to stderr
+
+source: The object to read env vars from. Defaults to process.env
+
+## Global options
+
+You can set global options by creating an instance rather than using the default
+object and passing them in.
+
+E.g. To supress all logging:
+```javascript
+const conf = require('sp-conf') ({
+  log: () => {}
+})
+```
+
 ## Methods available
 
 readNumber - Read a number and complain if its not a number
