@@ -1,6 +1,6 @@
 # SP Conf
 
-[![Build Status](https://travis-ci.org/codeite/sp-conf.svg?branch=master)](https://travis-ci.org/codeite/sp-conf)
+[![Build Status](https://api.travis-ci.org/codeite/sp-conf.svg?branch=master)](https://travis-ci.org/codeite/sp-conf)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
 SimPle CONFig
@@ -11,9 +11,7 @@ It will also check where any variables are missing and allow your to respond.
 
 ## Gettings Started
 
-
     $ npm install sp-conf --save
-
 
 ## How to use
 

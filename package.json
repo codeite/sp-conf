@@ -1,6 +1,6 @@
 {
   "name": "sp-conf",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "A small framework for reading config",
   "main": "index.js",
   "scripts": {
@@ -21,8 +21,8 @@
   },
   "homepage": "https://github.com/codeite/sp-conf#readme",
   "devDependencies": {
-    "mocha": "^2.3.3",
-    "must": "^0.13.1",
-    "standard": "^5.4.1"
+    "mocha": "^4.1.0",
+    "must": "^0.13.4",
+    "standard": "^10.0.3"
   }
 }
