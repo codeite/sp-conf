@@ -642,4 +642,10 @@ describe('SpConfig', () => {
 
     demand(instance).must.exist()
   })
+
+  it('must export deepFreeze functionality', () => {
+    const SpConf = require('../index.js')
+    const instance = SpConf()
+    instance.makeClonableAndDeepFreeze.must.be.a.function()
+  })
 })

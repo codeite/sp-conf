@@ -6,6 +6,7 @@ const deepFreeze = require('./deepFreeze')
 
 module.exports = SpConf
 
+SpConf.prototype.makeClonableAndDeepFreeze = deepFreeze.makeClonableAndDeepFreeze
 SpConf.makeClonableAndDeepFreeze = deepFreeze.makeClonableAndDeepFreeze
 
 function SpConf (defaultOptions) {
