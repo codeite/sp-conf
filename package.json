@@ -6,6 +6,9 @@
   "scripts": {
     "test": "mocha specs/**/*.spec.js && standard"
   },
+  "engines" : {
+    "node" : ">=4.8.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/codeite/sp-conf.git"
