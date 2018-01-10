@@ -1,6 +1,6 @@
 {
   "name": "sp-conf",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "description": "A small framework for reading config",
   "main": "index.js",
   "scripts": {
