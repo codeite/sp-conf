@@ -22,7 +22,7 @@ if (conf.missingEnvVars) {
   process.exit(1)
 }
 
-const mockConfig = conf.cloneAndRefreeze(x => x.user = 'test_user')
+const mockConfig = conf.cloneAndRefreeze(x => { x.user = 'test_user' })
 
 // mockConfig would be frozan and mockConfig.user would contain 'test_user'
 console.log(mockConfig.user)

@@ -21,7 +21,7 @@ function deepClone (o) {
 
   Object.getOwnPropertyNames(newO)
     .filter(p => _shouldClone(newO[p]))
-    .forEach(p => newO[p] = deepClone(newO[p]))
+    .forEach(p => { newO[p] = deepClone(newO[p]) })
 
   return newO
 }
