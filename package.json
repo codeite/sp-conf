@@ -1,13 +1,13 @@
 {
   "name": "sp-conf",
-  "version": "2.2.6",
+  "version": "2.2.7",
   "description": "A small framework for reading config",
   "main": "index.js",
   "scripts": {
     "test": "mocha specs/**/*.spec.js && standard"
   },
-  "engines" : {
-    "node" : ">=4.8.0"
+  "engines": {
+    "node": ">=4.8.0"
   },
   "repository": {
     "type": "git",
