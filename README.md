@@ -1,4 +1,5 @@
-#SP Conf
+# SP Conf
+
 [![Build Status](https://travis-ci.org/codeite/sp-conf.svg?branch=master)](https://travis-ci.org/codeite/sp-conf)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 
@@ -10,9 +11,9 @@ It will also check where any variables are missing and allow your to respond.
 
 ## Gettings Started
 
-```
-npm install sp-conf --save
-```
+
+    $ npm install sp-conf --save
+
 
 ## How to use
 
@@ -52,17 +53,24 @@ module.exports = myconfig
 
 ## Options common to all methods
 
-defaultValue: The value to use if the specified value is not available
+* `defaultValue` - The value to use if the specified value is not available
 
-validator: A regular expressing to specify the format of the input value
+* `validator` - A regular expressing to specify the format of the input value
 
-log: A function that logs about reading env var. E.g. `log: msg => console.log('message:', msg)`
-     Defaults to logging to stdout
+* `log` - A function that logs about reading env var. Defaults to logging to `stdout`.
+E.g. To log messages with a prefix:
+```javascript
+log: msg => console.log('message:', msg)
+```
 
-error: A function that reports errors while reading env var. E.g. `error: err => console.error('error:', err)`
-       Defaults to logging to stderr
+* `error` - A function that reports errors while reading env var. Defaults to logging to `stderr`.
+E.g. To log errors with a prefix:
+```javascript
+error: err => console.error('error:', err)
+```
 
-source: The object to read env vars from. Defaults to process.env
+
+* `source` - The object to read env vars from. Defaults to process.env
 
 ## Global options
 
@@ -71,25 +79,25 @@ object and passing them in.
 
 E.g. To supress all logging:
 ```javascript
-const conf = require('sp-conf') ({
+const conf = require('sp-conf')({
   log: () => {}
 })
 ```
 
 ## Methods available
 
-readNumber - Read a number and complain if its not a number
+* `readNumber` - Read a number and complain if its not a number
 
-readString - Read a string not applying any special rules
+* `readString` - Read a string not applying any special rules
 
-readPassword - Read a string but will obfuscate when logging the value out
+* `readPassword` - Read a string but will obfuscate when logging the value out
 
-readUrl - Read a URL and will obfuscate the password if the URL contains one.
+* `readUrl` - Read a URL and will obfuscate the password if the URL contains one.
 
-readBool - Read a boolean and complain if it's not valid. Epected characters are:
- * truthy values - "true", "t", "on", "1"
- * falsy falues - "false", "f", "off", "0"
- * It is not case sensitive so, for exaple, both "True" and "TRUE" work just fine
+* `readBool` - Read a boolean and complain if it's not valid. Epected characters are:
+  * truthy values - `"true"`, `"t"`, `"on"`, `"1"`
+  * falsy falues - `"false"`, `"f"`, `"off"`, `"0"`
+It is not case sensitive so, for example, both `"True"` and `"TRUE"` work just fine
 
 ## Deep freeze
 
