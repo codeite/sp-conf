@@ -1,6 +1,7 @@
 'strict mode'
 /* global describe, beforeEach, it */
 
+const demand = require('must')
 require('must/register')
 
 const LoggingLogger = require('./helpers/loggingLogger')
@@ -632,5 +633,13 @@ describe('SpConfig', () => {
     logListB.calls.length.must.equal(0)
     errorListB.calls.length.must.equal(1)
     errorListB.calls[0].must.equal('Required string env var "VAR_B" was not supplied.')
+  })
+
+  it('must be able to create a new instance without "new"', () => {
+    delete require.cache[require.resolve('../index.js')]
+    const SpConf = require('../index.js')
+    const instance = SpConf()
+
+    demand(instance).must.exist()
   })
 })

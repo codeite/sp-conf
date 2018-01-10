@@ -9,6 +9,8 @@ module.exports = SpConf
 SpConf.makeClonableAndDeepFreeze = deepFreeze.makeClonableAndDeepFreeze
 
 function SpConf (defaultOptions) {
+  if (!(this instanceof SpConf)) return new SpConf(defaultOptions)
+
   this.defaultOptions = _cleanOptions(defaultOptions)
   this.missingEnvVars = false
 }
